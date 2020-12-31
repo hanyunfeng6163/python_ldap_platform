@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>bstreeview</title>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"
+		  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+		  integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+	<link href="css/bstreeview.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container">
+		<div class="content">
+			<div class="row">
+				<div class="col-md-6 pt-5">
+					<div id="tree">
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+			integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+			crossorigin="anonymous"></script>
+
+	<script src="js/bstreeview.js">
+	</script>
+	<script>
+		$(function () {
+
+
+            var json = [
+                {
+                    text: "Inbox",
+                    icon: "fa fa-folder-o",
+                    nodes: [
+                        {
+                            text: "Office",
+                            icon: "fa fa-folder-o",
+                            nodes: [
+                                {
+                                    icon: "fa fa-folder-o",
+                                    text: "Customers"
+                                },
+                                {
+                                    icon: "fa fa-folder-o",
+                                    text: "Co-Workers",
+                                }
+                            ]
+                        },
+                        {
+                            icon: "fa fa-folder-o",
+                            text: "Others"
+                        }
+                    ]
+                },
+                {
+                    icon: "fa fa-folder-o",
+                    text: "Drafts",
+                    href: "https://google.com",
+                    show: true,
+                    nodes: [
+                        {
+                            text: "Office",
+                            icon: "fa fa-folder-o",
+                            show: true,
+                            nodes: [
+                                {
+                                    icon: "fa fa-folder-o",
+                                    text: "Customers"
+                                },
+                                {
+                                    icon: "fa fa-folder-o",
+                                    text: "Co-Workers",
+                                    class: "active",
+
+                                }
+                            ]
+                        },
+                        {
+                            icon: "fa fa-folder-o",
+                            text: "Others"
+                        }
+                    ]
+                },
+                {
+                    icon: "fa fa-folder-o",
+                    text: "Calendar"
+                },
+                {
+                    icon: "fa fa-folder-o",
+                    text: "Contacts"
+                },
+                {
+                    icon: "fa fa-folder-o",
+                    text: "Deleted Items"
+                },
+                {
+                    icon: "fa fa-folder-o",
+                    text: "Go to Google",
+                    class: "text-info",
+                    href: "https://google.com"
+                }
+            ];
+
+            $('#tree').bstreeview({
+                data: json,
+                expandIcon: 'fa fa-angle-down fa-fw',
+                collapseIcon: 'fa fa-angle-right fa-fw',
+                indent: 2.0,
+                parentsMarginLeft: '1.5rem',
+                openNodeLinkOnNewTab: true
+            });
+
+
+		});
+	</script>
+</body>
+</html>

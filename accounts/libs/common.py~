@@ -1,0 +1,165 @@
+# -*- coding: utf-8 -*
+# @author: 韩云峰
+# @time: 2019/3/20 17:51
+
+from time import time
+from random import random, Random
+from urllib.parse import parse_qsl, urlunsplit, urlsplit
+from uuid import uuid3, NAMESPACE_URL
+
+from django.conf import settings
+from django.contrib.auth import authenticate, login
+from django.core.mail import send_mail
+from django.http import HttpResponseRedirect
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+from accounts.libs import con_redis
+
+redis_conn = con_redis.cacheRedis()
+
+
+def auth_interceptor(user):
+    # 帐号锁待处理
+    if user.is_lock:
+        return False, '当前用户已经锁定，请联系管理员'
+    else:
+        return True, '验证成功'
+
+
+def Auth(request, userName, passWord):
+    user = authenticate(username=userName, password=passWord)
+    if user is not None:
+        interceptor_user = auth_interceptor(user)
+        if interceptor_user[0]:
+            login(request, user)
+            return True, '登陆成功!'
+        else:
+            return False, interceptor_user[1]
+    else:
+        return False, '用户名或密码错误'
+
+
+def getForward(request, refererForward=None):
+    if refererForward is None:
+        refererForward = settings._DEFAULT_FORWARD
+
+    next = request.GET.get("next", refererForward)
+    forward = request.GET.get("forward", next)
+    forwardObj = urlsplit(forward)
+    if not forwardObj.netloc:
+        return forward, None
+
+    query = ''
+    url = urlunsplit((forwardObj.scheme, forwardObj.netloc, forwardObj.path, query, forwardObj.fragment))
+    modifyUrl = '%s?' % url
+    return modifyUrl, forwardObj.netloc
+
+
+def makeTicket(username, remote_addr):
+    ticket = "%s%d%s%f" % (username, time(), remote_addr, random())
+    return str(uuid3(NAMESPACE_URL, ticket))
+
+
+def cacheUser(username, ticket, domain):
+    t_data = {
+        "username": username,
+        "ticket": ticket,
+        "domain": domain,
+    }
+    return redis_conn.setTicket(settings._TIME_OUT, **t_data)
+
+
+def combineTicket(forward, ticket):
+    finall = forward + '%s=%s' % (settings._TICKET_NAME, ticket)
+    return finall
+
+
+def cacheLogoutUser(ticket):
+    if ticket:
+        return redis_conn.delTicket(ticket)
+    return True
+
+
+def getUserByTicket(ticket):
+    print(ticket)
+    data = redis_conn.findTicket(ticket)
+    if data:
+        return data
+    else:
+        return None
+
+
+def loginRedirect(request, forward, domain, username):
+    remote_addr = request.META.get("REMOTE_ADDR")
+    print(remote_addr)
+    t = request.session.get(settings._TICKET_NAME)
+    print('----')
+    print(forward)
+    print(domain)
+    print(t)
+    print('+++++')
+    if t:
+        print('ccc')
+        cacheLogoutUser(t)
+    if domain:
+        print('有域名进来了')
+        ticket = makeTicket(username, remote_addr)
+        print('make ticket')
+        print(ticket)
+        request.session[settings._TICKET_NAME] = ticket
+        cacheUser(username, ticket, domain)
+        return HttpResponseRedirect(combineTicket(forward, ticket))
+    return HttpResponseRedirect(forward)
+
+
+def getRefererForward(request):
+    referer = request.META.get("HTTP_REFERER")
+    if not referer:
+        return False
+    res = urlsplit(referer).netloc
+    if res:
+        return res
+    else:
+        return False
+
+
+def pagination(request, queryset, display_amount=10, after_range_num=8, before_range_num=7):
+    try:
+        page = int(request.GET.get("page", 1))
+        if page < 1:
+            page = 1
+    except ValueError:
+        page = 1
+
+    paginator = Paginator(queryset, display_amount)
+    count = paginator.count
+    num_pages = paginator.num_pages
+    try:
+        objects = paginator.page(page)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    temp_range = paginator.page_range
+    if (page - before_range_num) <= 0:
+        if temp_range[-1] > after_range_num:
+            page_range = range(1, after_range_num + 1)
+        else:
+            page_range = range(1, temp_range[-1] + 1)
+    elif (page + after_range_num) > temp_range[-1]:
+        page_range = range(page - before_range_num, temp_range[-1] + 1)
+    else:
+        page_range = range(page - before_range_num +
+                           1, page + after_range_num)
+    return objects, page_range, count, num_pages
+
+
+def random_str(randomlength=8):
+    str = ''
+    chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
+    length = len(chars) - 1
+    random = Random()
+    for i in range(randomlength):
+        str += chars[random.randint(0, length)]
+    return str

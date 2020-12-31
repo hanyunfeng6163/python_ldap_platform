@@ -1,0 +1,35 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-cn">
+{% load static %}
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta http-equiv="Content-Language" content="zh-CN"/>
+    <meta name="Author" content="韩云峰"/>
+    <meta name="keywords" content="devops"/>
+    <meta name="description" content="一个小小只"/>
+
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/core/core.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/fonts/feather-font/css/iconfont.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/flag-icon-css/css/flag-icon.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    {% block localcss %} {% endblock %}
+</head>
+<body>
+<div class="main-wrapper">
+    <div class="page-wrapper full-page">
+        <div class="page-content d-flex align-items-center justify-content-center">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'assets/vendors/core/core.js' %}"></script>
+<script src="{% static 'assets/vendors/feather-icons/feather.min.js' %}"></script>
+<script src="{% static 'assets/js/template.js' %}"></script>
+<script src="{% static 'assets/vendors/layer/layer.js' %}"></script>
+
+{% block localjs %} {% endblock %}
+<!-- end custom js for this page -->
+</body>
+</html>

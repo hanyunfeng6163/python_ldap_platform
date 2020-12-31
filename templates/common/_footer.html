@@ -1,0 +1,13 @@
+<footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between">
+    <p class="text-muted text-center text-md-left">Copyright © 2019 <a href="{{ DOMAIN_NAME }}"
+                                                                       target="_blank">{{ SITE_NAME }}</a>. All rights
+        reserved</p>
+    <!--
+           <p class="text-muted text-\ text-md-left mb-0 d-none d-md-block">Handcrafted With <i
+                   class="mb-1 text-primary ml-1 icon-small" data-feather="heart"></i></p>
+                   -->
+
+    <p class="text-muted  text-md-left mb-0 d-none d-md-block">{{ request.user.login_info.source }} login
+        from {{ request.user.login_info.login_ip }}</p>
+
+</footer>

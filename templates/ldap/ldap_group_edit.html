@@ -1,0 +1,121 @@
+{% extends 'common/_layer.html' %}
+{% load static %}
+{% block localcss %}
+    <link rel="stylesheet" href="{% static 'plugins/combo-tree/css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/combo-tree/css/style.css' %}">
+{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">修改部门信息</h6>
+                    <form class="forms-sample" method="post">
+                        <div class="form-group">
+                            <label>部门名：</label>
+                            <input type="text" name="group_name" class="form-control" id="group_name" autocomplete="off"
+                                   placeholder="" value="{{ old_group_dn }}">
+                        </div>
+                        <div class="form-group">
+                            <label>上级部门：</label>
+                            <input type="text" name="upper_group" class="form-control" id="justAnotherInputBox"
+                                   autocomplete="off" placeholder="">
+                        </div>
+                        <button type="button" onclick="commit_data()" class="btn btn-primary mr-2">提交</button>
+                        <input type="button" class="btn btn-warning" name="close" value="关闭"
+                               onclick="parent.layer.close(parent.layer.getFrameIndex(window.name));"/>
+
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block localjs %}
+    <!--弃用 <script src="{% static 'plugins/combo-tree/js/icontains.js' %}"></script> -->
+    <script src="{% static 'plugins/combo-tree/js/comboTreePlugin.js' %}"></script>
+
+    <script type="text/javascript">
+
+        //var SampleJSONData = [
+        //   {
+        //      id: 0,
+        //     title: 'choice 1  '
+        // }
+        //];
+        var index = parent.layer.getFrameIndex(window.name);
+
+        function ldap_group_form_tree() {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "get",
+                url: '/accounts/ldap/ldap_group_form_tree/{{ pk }}/{{ group_dn }}/',
+                datatype: 'json',
+                success: function (data) {
+                    //console.log(typeof(data));
+                    // result = JSON.parse(data);
+                    result = JSON.parse(JSON.stringify(data));
+                    console.log(result)
+                }
+            });
+            return result
+        }
+
+
+        let SampleJSONData = ldap_group_form_tree();
+
+        var comboTree1, comboTree2;
+
+        jQuery(document).ready(function ($) {
+
+            comboTree1 = $('#justAnInputBox').comboTree({
+                source: SampleJSONData,
+                isMultiple: true
+            });
+
+            comboTree2 = $('#justAnotherInputBox').comboTree({
+                source: SampleJSONData,
+                isMultiple: false,
+                selected: ['{{ parent_dn }}'],
+
+            });
+
+        });
+
+
+        function commit_data() {
+            console.log(comboTree2.getSelectedIds());
+            $.ajax({
+                    url: '/accounts/ldap/ldap_group_edit/{{ pk }}/{{ parent_dn }}/{{ group_dn }}/',
+                    method: 'post',
+                    data: {
+                        upper_group: comboTree2.getSelectedIds()[0],
+                        //upper_group: JSON.parse(comboTree2.getSelectedIds()),
+                        group_name: $('#group_name').val()
+                    },
+                    success: function (data) {
+                        if (data.status === 0) {
+                            layer.msg('成功', {
+                                icon: 1,
+                                time: 1500,
+                                end: function () {
+                                    parent.location.reload(index);
+                                }
+                            });
+                        } else {
+                            layer.msg('失败', {icon: 2});
+
+                        }
+                    },
+                    error: function (data) {
+                        layer.msg('提交失败', {icon: 2});
+                    }
+                }
+            )
+        }
+    </script>
+{% endblock %}

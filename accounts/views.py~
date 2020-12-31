@@ -1,0 +1,84 @@
+import json
+import requests
+
+from django.conf import settings
+from django.contrib.auth import logout
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+
+# Create your views here.
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+
+from accounts.libs.common import getForward, loginRedirect, Auth, getUserByTicket, getRefererForward, cacheLogoutUser
+
+
+def web_login(request):
+    template = 'accounts/login.html'
+    forward, domain = getForward(request)
+    if request.user.is_authenticated:
+        return loginRedirect(request, forward, domain, request.user.username)
+    if request.method == 'POST':
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        print('1')
+        auth_reault = Auth(request, username, password)
+        print('2')
+        if auth_reault[0]:
+            print('5')
+            return loginRedirect(request, forward, domain, username)
+        else:
+            print('6')
+            return render(request, template, {"error": {"message": auth_reault[1]}})
+    else:
+        print('3')
+        return render(request, template, locals())
+
+
+def ticket_check(request):
+    print('youma')
+    ticket = str(request.GET.get(settings._TICKET_NAME, None))
+    status = {"result": False, "user": False, settings._TICKET_NAME: ticket, 'message': None, 'nickname': None,
+              'email': None}
+
+    if ticket is None:
+        status['message'] = 'No ticket'
+        return HttpResponse(json.dumps(status), content_type="application/json")
+
+    loginCacheData = getUserByTicket(ticket)
+
+    if loginCacheData is None:
+        status['message'] = 'Bad ticket'
+        return HttpResponse(json.dumps(status), content_type="application/json")
+
+    domain = getRefererForward(request)
+    if not domain:
+        status['message'] = "No domain"
+        return HttpResponse(json.dumps(status), content_type="application/json")
+
+    if domain != loginCacheData['domain']:
+        status['message'] = 'Domain not compaire'
+        return HttpResponse(json.dumps(status), content_type="application/json")
+
+    status['user'] = loginCacheData['username']
+    status['result'] = True
+    status['message'] = 'Success'
+    return HttpResponse(status['user'])
+
+
+def logoutUser(request):
+    t = request.session.get(settings._TICKET_NAME)
+    if t:
+        cacheLogoutUser(t)
+    request.session.clear()
+    logout(request)
+
+
+def web_logout(request):
+    forward, domain = getForward(request, settings._LOGIN_URL)
+    if request.user.is_authenticated:
+        logoutUser(request)
+    r = requests.get('http://127.0.0.1:8000/auth/logout_api') 
+    print(r.text)
+    return HttpResponseRedirect(forward)
+

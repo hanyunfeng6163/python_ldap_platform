@@ -1,0 +1,29 @@
+{% extends 'common/_base_center.html' %}
+{% load static %}
+{% block title %}跳转中..{% endblock %}
+{% block localcss %}
+{% endblock %}
+{% block content %}
+    <div class="alert alert-success" role="alert">
+        {{ content }}。<b id="second">5</b>秒后返回登录页 <a href="javascript:goBack();">返回</a>
+    </div>
+
+{% endblock %}
+{% block localjs %}
+    <script type="text/javascript">
+
+        var sec = document.getElementById("second");
+        var i = 5;
+        var timer = setInterval(function () {
+            i--;
+            sec.innerHTML = i;
+            if (i == 1) {
+                window.location.href = "/login/";
+            }
+        }, 1000);
+
+        function goBack() {
+            window.location.href = "/login/";
+        }
+    </script>
+{% endblock %}

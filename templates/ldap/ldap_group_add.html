@@ -1,0 +1,75 @@
+{% extends 'common/_layer.html' %}
+{% load static %}
+{% block localcss %}
+    <link rel="stylesheet" href="{% static 'plugins/combo-tree/css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/combo-tree/css/style.css' %}">
+{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">添加子部门</h6>
+                    <form class="forms-sample" method="post">
+                        <div class="form-group">
+                            <label>部门名：</label>
+                            <input type="text" name="group_name" class="form-control" id="group_name" autocomplete="off"
+                                   placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label>上级部门：</label>
+                            <input type="text" name="upper_group" class="form-control" id="upper_group"
+                                   autocomplete="off" placeholder="" value="{{ parent_dn }}" disabled="disabled">
+                        </div>
+                        <button type="button" onclick="commit_data()" class="btn btn-primary mr-2">提交</button>
+                        <input type="button" class="btn btn-warning" name="close" value="关闭"
+                               onclick="parent.layer.close(parent.layer.getFrameIndex(window.name));"/>
+
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block localjs %}
+    <!--弃用 <script src="{% static 'plugins/combo-tree/js/icontains.js' %}"></script> -->
+    <script src="{% static 'plugins/combo-tree/js/comboTreePlugin.js' %}"></script>
+
+    <script type="text/javascript">
+
+        var index = parent.layer.getFrameIndex(window.name);
+        function commit_data() {
+            let group_name = $('#group_name').val();
+            let upper_group = $('#upper_group').val();
+            $.ajax({
+                    url: '/accounts/ldap/ldap_group_add/{{ pk }}/{{ parent_dn }}/',
+                    method: 'post',
+                    data: {
+                        group_name: group_name,
+                        upper_group: upper_group,
+                    },
+                    success: function (data) {
+                        if (data.status === 0) {
+                            layer.msg('成功', {
+                                icon: 1,
+                                time: 1500,
+                                end: function () {
+                                    parent.location.reload(index);
+                                }
+                            });
+                        } else {
+                            layer.msg('失败', {icon: 2});
+
+                        }
+                    },
+                    error: function (data) {
+                        layer.msg('提交失败', {icon: 2});
+                    }
+                }
+            )
+        }
+    </script>
+{% endblock %}

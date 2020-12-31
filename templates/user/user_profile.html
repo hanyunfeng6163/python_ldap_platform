@@ -1,0 +1,99 @@
+{% extends 'common/_base.html' %}
+{% block title %}个人信息{% endblock %}
+{% block content %}
+    <nav class="page-breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item active" aria-current="page">个人信息</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="card-title mb-0">基本信息</h6>
+                        <!--
+                        <div class="dropdown">
+                            <button class="btn p-0" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="icon-lg text-muted pb-3px" data-feather="more-horizontal"></i>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="#">Edit</a>
+                            </div>
+                        </div>
+                        -->
+                    </div>
+                </div>
+                <div class="card-body">
+
+
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">用户名:</label>
+                        <p class="text-muted">{{ request.user.nickname }}({{ request.user.username }})</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">邮箱:</label>
+                        <p class="text-muted">{{ request.user.email }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">手机:</label>
+                        <p class="text-muted">{{ request.user.phone }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">账号注册来源:</label>
+                        <p class="text-muted">{{ request.user.source }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">是否管理员:</label>
+                        <p class="text-muted">{% if request.user.is_superuser %} 是 {% else %} 否 {% endif %}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">拥有的所有角色:</label>
+                        <p class="text-muted">
+                            {% for i in request.user.roles.all %}
+                                <span class="badge badge-primary">{{ i.title }}</span>
+                            {% endfor %}
+                        </p>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-3 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="card-title mb-0">登录信息</h6>
+                    </div>
+                </div>
+                <div class="card-body">
+
+
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">最后登录时间:</label>
+                        <p class="text-muted">{{ request.user.login_info.login_time }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">最后登录ip:</label>
+                        <p class="text-muted">{{ request.user.login_info.login_ip }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <label class="tx-11 font-weight-bold mb-0 text-uppercase">最后登录方式:</label>
+                        <p class="text-muted">{{ request.user.login_info.source }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</div>
+{% endblock %}

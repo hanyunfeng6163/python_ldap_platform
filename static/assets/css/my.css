@@ -1,0 +1,6 @@
+.hidden-button {
+    opacity: 0;
+}
+tr:hover .hidden-button {
+    opacity: 1;
+}

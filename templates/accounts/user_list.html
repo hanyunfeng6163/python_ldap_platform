@@ -1,0 +1,70 @@
+{% extends 'common/_base.html' %}
+{% block title %}本地用户列表{% endblock %}
+{% block content %}
+    <nav class="page-breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item active" aria-current="page">本地用户列表</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">本地用户列表</h6>
+                    <p class="card-description"><a href="/accounts/user/add/" class="btn btn-info btn-sm">添加用户</a></p>
+                    <p class="card-description">此处为<code>统一登录系统</code>的本地用户,可以对使用本站授权的用户进行锁定、禁用等操作，也可以使用本地账号登录</p>
+                    <p class="card-description">用户不论使用何种登录方式（ldap、钉钉等），最终信息都要和本地用户一致</p>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>手机</th>
+                                <th>角色</th>
+                                <th>状态</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for i in object_list %}
+                                <tr>
+                                    <th>{{ i.id }}</th>
+                                    <td>{{ i.username }}</td>
+                                    <td>{{ i.email }}</td>
+                                    <td>{{ i.phone }}</td>
+
+                                    <td>
+                                        {% for role in i.roles.all %}
+                                            <span class="badge badge-primary">{{ role }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% if not i.is_active or i.is_lock %}
+                                            <i data-feather="lock" class="icon-sm"> </i>
+                                        {% endif %}
+                                        {% if i.is_superuser %}
+                                            <i data-feather="user-check" class="icon-sm"> </i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a class="hidden-button" title="编辑" href="/accounts/user/update/{{ i.id }}"><i
+                                                data-feather="edit" class="icon-sm"> </i></a>
+                                        &nbsp
+                                        <a class="hidden-button" title="删除" href="javascript:void(0);"
+                                           onclick="object_delete('/accounts/user','{{ i.id }}')"><i
+                                                data-feather="x" class="icon-sm"> </i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

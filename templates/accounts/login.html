@@ -1,0 +1,138 @@
+{% extends 'common/_base_center.html' %}
+{% load static %}
+{% block title %}登录{% endblock %}
+{% block localcss %}
+{% endblock %}
+{% block content %}
+    <div class="row w-100 mx-0 auth-page">
+        <div class="col-md-8 col-xl-6 mx-auto">
+            <div class="card">
+                <div class="row">
+                    <div class="col-md-4 pr-md-0">
+                        <div class="auth-left-wrapper">
+
+                        </div>
+                    </div>
+                    <div class="col-md-8 pl-md-0">
+                        <div class="auth-form-wrapper px-4 py-5" style="min-height: 530px">
+                            <span class="noble-ui-logo d-block mb-2">LDAP <span>platform</span></span>
+                            <h5 class="text-muted font-weight-normal mb-4">
+                                {% if error %}
+                                    <span style="color:red">{{ error }}</span>
+                                {% else %}
+                                    Welcome back! Log in to your account.
+                                {% endif %}
+                            </h5>
+
+
+                            <div class="container">
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-tabs" role="tablist">
+
+                                    {% for i in l_s %}
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-toggle="tab" href="#ldap_{{ i.id }}">LDAP</a>
+                                    </li>
+                                    {% endfor %}
+                                <li class="nav-item">
+                                        <a class="nav-link " data-toggle="tab" href="#standard">Standard</a>
+                                    </li>
+                                </ul>
+
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+
+                                    {% for i in l_s %}
+                                    <div id="ldap_{{ i.id }}" class="container tab-pane active "><br>
+                                        <form class="forms-sample" method="post">
+                                            <input name="ldapserver_id" value="{{ i.id }}" hidden="hidden">
+                                            <div class="form-group">
+                                                <label>LDAP Username</label>
+                                                <input type="text" class="form-control" name="ldap_username"
+                                                       placeholder="">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Password</label>
+                                                <input type="password" class="form-control" name="ldap_password"
+                                                       autocomplete="current-password" placeholder="">
+                                            </div>
+                                            <br/>
+
+
+                                            <div class="mt-3">
+                                                <button type="submit"
+                                                        class="btn btn-primary btn-icon-text mr-2 mb-2 mb-md-0">
+                                                    Ldap Sign in
+                                                </button>
+                                            </div>
+                                            <a href="/accounts/ldap/send_forget_password_email/{{ i.id }}/"
+                                               class="d-inline-block mt-3 text-muted">Forget the password
+                                                ? </a>
+                                        </form>
+                                    </div>
+                                    {% endfor %}
+                                 <div id="standard" class="container tab-pane fade"><br>
+                                        <form class="forms-sample" method="post">
+                                            <div class="form-group">
+                                                <label>Username</label>
+                                                <input type="text" class="form-control" name="username" placeholder="">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Password</label>
+                                                <input type="password" class="form-control" name="password"
+                                                       autocomplete="current-password" placeholder="">
+                                            </div>
+                                            <br/>
+
+
+                                            <div class="mt-3">
+                                                <button type="submit"
+                                                        class="btn btn-primary btn-icon-text mr-2 mb-2 mb-md-0">
+                                                    Sign in
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block localjs %}
+    <script src="https://g.alicdn.com/dingding/dinglogin/0.0.5/ddLogin.js"></script>
+    <script>
+        var search_kwargs = window.location.search; //获取当前页面参数，后面传递给dingtalk, 在单点登录系统中，需要在认证后跳转回客户端地址
+        var url = encodeURIComponent('http://127.0.0.1:8888/ding_callback/' + search_kwargs);
+        var goto = encodeURIComponent('https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=dingoarxpij0hltu6axmyp&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=' + url);
+        var obj = DDLogin({
+            id: "login_container",//这里需要你在自己的页面定义一个HTML标签并设置id，例如<div id="login_container"></div>或<span id="login_container"></span>
+            goto: goto, //请参考注释里的方式
+            style: "border:none;background-color:#FFFFFF;",
+            width: "466",
+            height: "286",
+        });
+        var handleMessage = function (event) {
+            var origin = event.origin;
+            console.log("origin", event.origin);
+            if (origin == "https://login.dingtalk.com") { //判断是否来自ddLogin扫码事件。
+                var loginTmpCode = event.data;
+                console.log("loginTmpCode", loginTmpCode);
+                //获取到loginTmpCode后就可以在这里构造跳转链接进行跳转了
+                var url2 = "https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=dingoarxpij0hltu6axmyp&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=" + url + "&loginTmpCode=" + loginTmpCode;
+                window.location.href = url2;
+
+                console.log("loginTmpCode", loginTmpCode);
+            }
+        };
+        if (typeof window.addEventListener != 'undefined') {
+            window.addEventListener('message', handleMessage, false);
+        } else if (typeof window.attachEvent != 'undefined') {
+            window.attachEvent('onmessage', handleMessage);
+        }
+    </script>
+{% endblock %}

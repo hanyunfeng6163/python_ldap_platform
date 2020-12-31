@@ -1,0 +1,46 @@
+{% extends 'common/_base.html' %}
+{% block title %}登录信息{% endblock %}
+{% block content %}
+    <nav class="page-breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">首页</a></li>
+            <li class="breadcrumb-item active" aria-current="page">登录信息</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+
+                    <h6 class="card-title">登录信息</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>用户</th>
+                                <th>状态</th>
+                                <th>域名</th>
+                                <th>时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for i in object_list %}
+                                <tr>
+                                    <th>{{ i.id }}</th>
+                                    <td>{{ i.user }}</td>
+                                    <td>{{ i.get_status_display }}</td>
+                                    <td>{{ i.domain.domain_name }}</td>
+                                    <td>{{ i.create_at }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                </div>
+                {% include 'common/pagination.html' %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,472 @@
+{% extends 'common/_base.html' %}
+{% load static %}
+
+{% block localcss %}
+    <link rel="stylesheet" href="{% static 'plugins/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/bstreeview-1.2.0/css/bstreeview.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/jstree/themes/default/style.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css' %}">
+
+{% endblock %}
+{% block title %}测试{% endblock %}
+{% block content %}
+
+    <div class="row inbox-wrapper">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-3 email-aside border-lg-right">
+                            <div class="aside-content">
+                                <div class="aside-header">
+                                    <button class="navbar-toggle" data-target=".aside-nav" data-toggle="collapse"
+                                            type="button"><span class="icon"><i data-feather="chevron-down"></i></span>
+                                    </button>
+
+                                    <span class="title">{{ this_object.desc }}-{{ this_object.ldap_server }}</span>
+                                    <p class="description">{{ this_object.host }}:{{ this_object.port }}</p>
+                                </div>
+                                <div class="aside-compose">
+                                    <div class="btn-group btn-group-sm btn-block" role="group"
+                                         aria-label="Basic example">
+                                        <button onclick="location.reload();" type="button" class="btn btn-primary">
+                                            组织架构
+                                        </button>
+                                        <button onclick="refresh_tree()" type="button" class="btn btn-info">刷新
+                                        </button>
+                                    </div>
+
+                                </div>
+                                <div class="aside-nav collapse">
+                                    <div id="tree"></div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-9 email-content">
+                            <div class="email-inbox-header">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-6">
+                                        <div class="email-title mb-2 mb-md-0"><span class="icon"><i
+                                                data-feather="inbox"></i></span>
+                                            <span id="group-title">组织架构</span>
+                                            <span class="new-messages" id="group-breadcrumbs"></span>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <!--
+                                        <div class="email-search">
+                                            <div class="input-group input-search">
+                                                <input id="search_user" class="form-control" type="text"
+                                                       placeholder="人员搜索"><span class="input-group-btn">
+                              <button onclick="search_user()" class="btn btn-outline-secondary" type="button"><i
+                                      data-feather="search"></i></button></span>
+                                            </div>
+                                        </div>
+                                        -->
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+
+
+                            <div class="email-list col-lg-12" style="padding-left: 18px;height: 100%">
+                                <h4 class="card-title"><i class="fa fa-sitemap" aria-hidden="true"></i>&nbsp 下级部门</h4>
+
+                                <div id="children_list" style="min-height: 50px">
+
+                                </div>
+
+
+                                <h4 class="card-title"><i class="fa fa-users" aria-hidden="true"></i>&nbsp 部门人员</h4>
+                                <button class="mb-1 btn btn-outline-info" onclick="user_add()">添加成员</button>
+                                <hr>
+                                <div style="min-height: 50px">
+                                    <table class="table" id="myTable"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block localjs %}
+    <script src="{% static 'plugins/jstree/jstree.min.js' %}"></script>
+    <script src="{% static 'plugins/dataTables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/dataTables/base.js' %}"></script>
+    <script src="{% static 'assets/vendors/datatables.net-bs4/dataTables.bootstrap4.js' %}"></script>
+
+    <script type="text/javascript">
+
+        let user_parent_dn = 'top';
+        var user_tables = $('#myTable').DataTable({
+            ajax: {
+                url: "/accounts/ldap/ldap_all_user/{{ pk }}/",
+                dataSrc: ""
+            },
+            order: [[2, "desc"]],
+            columnDefs: [
+                {
+                    targets: 3,
+                    data: "telephoneNumber",
+                    title: "telephoneNumber",
+                    render: function (data, type, row, meta) {
+                        if ('telephoneNumber' in row.attributes) {
+                            return row.attributes.telephoneNumber
+                        } else {
+                            return ''
+                        }
+                    }
+                }, {
+                    targets: 2,
+                    data: "mail",
+                    title: "mail",
+                    render: function (data, type, row, meta) {
+                        if ('mail' in row.attributes) {
+                            return row.attributes.mail
+                        } else {
+                            return ''
+                        }
+                    }
+                }, {
+                    targets: 1,
+                    data: "displayName",
+                    title: "displayName",
+                    render: function (data, type, row, meta) {
+                        if ('displayName' in row.attributes) {
+                            return row.attributes.displayName
+                        } else {
+                            return ''
+                        }
+                    }
+                }, {
+                    targets: 0,
+                    data: "cn",
+                    title: "cn",
+                    render: function (data, type, row, meta) {
+                        if ('cn' in row.attributes) {
+                            return row.attributes.cn
+                        } else {
+                            return ''
+                        }
+                    }
+                },]
+        });
+        let this_tbody = $('#myTable tbody');
+        this_tbody.on('click', 'tr',
+            // 表格点击事件，打开编辑按钮
+            function () {
+                row_data = user_tables.row(this).data();
+                cn = row_data['attributes']['cn'][0];
+                user_edit(cn)
+            });
+        this_tbody.on('mouseover', 'tr',
+            // 鼠标悬浮，改变颜色
+            function () {
+                $(this).css("cursor", "pointer");
+                $(this).css("background-color", "#e7e8eb");
+            });
+        this_tbody.on('mouseout', 'tr',
+            // 鼠标离开，恢复为白色背景
+            function () {
+                $(this).css("background-color", "#fff");
+            });
+        let this_tree = $("#tree");
+
+        $(function () {
+            this_tree.jstree({
+                "core": {
+                    "themes": {
+                        "variant": "large",
+                        "dots": true,
+                    },
+                    /*
+                   'data' : [
+                    {
+                        'id' : 'node_2',
+                        'text' : 'Root node with options',
+                        'state' : { 'opened' : true, 'selected' : true },
+                        'children' : [ { 'text' : 'Child 1' }, 'Child 2']
+                    }
+                    ]
+                    */
+
+                    'data': {
+                        'url': '/accounts/ldap/ldap_tree/{{ pk }}/',
+                        "datatype": "json",
+                        'data': function (node) {
+                            return {'id': node.id};
+                        }
+                    }
+                },
+                "plugins": ["wholerow", "themes", "search"]
+            });
+
+            /* 废弃的请求用户列表功能
+            $.get('/accounts/ldap/ldap_all_user/', function (data) {
+                    user_list = '';
+                    for (k in data){
+                        if (data[k]['attributes']['sn'][0] !== 'base'){
+                            sn = data[k]['attributes']['sn'][0];
+                            cn = data[k]['attributes']['cn'][0];
+                            if (data[k]['attributes'].hasOwnProperty('mail')){
+                                mail = data[k]['attributes']['mail'][0];
+                            }else{
+                                mail = ''
+                            }
+                            if (data[k]['attributes'].hasOwnProperty('telephoneNumber')){
+                                telephoneNumber = data[k]['attributes']['telephoneNumber'][0];
+                            }else{
+                                telephoneNumber = ''
+                            }
+                            user_list += " <tr>\n" +
+                                "                        <td>"+sn+"</td>\n" +
+                                "                        <td>"+cn+"</td>\n" +
+                                "                        <td>"+mail+"</td>\n" +
+                                "                        <td>"+telephoneNumber+"</td>\n" +
+                                "                      </tr>"
+
+                        }
+                    }
+                    $("#user_list").html(user_list);
+                });
+                */
+
+        });
+
+        // 初始的tree加载完成后，把第一级别的部门取出来，在右侧显示
+        this_tree.bind("loaded.jstree", function (obj, e) {
+            tree_init_arr = e.instance._model.data['#'].children;
+            let children_list_init = '';
+            for (chre in tree_init_arr) {
+                // console.log(e.instance._model.data[tree_init_arr[chre]].text);
+                children_list_init += '<button onclick="jump_to_node(\'' + tree_init_arr[chre] + '\')" type="button" class="mb-1 btn btn-outline-primary">' + e.instance._model.data[tree_init_arr[chre]].text + '</button> '
+            }
+            // 如果是顶级菜单，设定parent值为top
+            children_list_init += '<button class="mb-1 btn btn-outline-info" onclick="group_add(\'top\')">添加子部门</button>';
+            $("#children_list").html(children_list_init);
+        });
+
+        this_tree.bind("activate_node.jstree", function (obj, e) {
+            // 处理代码
+            // 获取当前节点
+            let currentNode = e.node;
+            user_parent_dn = currentNode['id']; //赋值给user_parent_dn ,在新建用户的时候用来传递当前的部门,类似: -技术部-运维部-安全运维-应用安全
+            // 拼装面包屑+++++++++++++++++++++++++++++++++++
+            // 如果当前节点不是第一级组，那么进入下面的if判断，倒序拼装一个面包屑
+            if (currentNode.parent !== '#') {
+                let group_b = "(";
+                for (let i = currentNode.parents.length - 1; i >= 0; i--) {
+                    if (currentNode.parents[i] !== '#') {
+                        // console.log(currentNode)
+                        group_b += '<a href="javascript:void(0)" onclick="jump_to_node(\'' + currentNode.parents[i] + '\')">' + e.instance._model.data[currentNode.parents[i]].text + ' > </a>'
+                    }
+                }
+                // 上级组拼装后，把当前的组名拼装在最后
+                group_b += currentNode['text'] + ')';
+                $("#group-breadcrumbs").html(group_b);
+            } else {
+                $("#group-breadcrumbs").html('');
+            }
+            //console.log(currentNode.parent);
+            //console.log(currentNode['id']);
+            // 单击tree后，右侧title显示当前的组名
+            //$("#group-title").html(currentNode['id']);
+            if (currentNode.parent !== '#') {
+                $("#group-title").html('<a href="javascript:void(0)" onclick="group_edit(\'' + currentNode.parent + '\',\'' + currentNode['id'] + '\')">' + currentNode['text'] + '</a>');
+            } else {
+                // 如果是顶级菜单，设定parent值为top
+                $("#group-title").html('<a href="javascript:void(0)" onclick="group_edit(\'top\',\'' + currentNode['id'] + '\')">' + currentNode['text'] + '</a>');
+
+            }
+            // 下级部门列表+++++++++++++++++++++++++++++++++++
+            // 激活某个节点后，把第一级别的部门取出来，在右侧显示
+            let children_list = '';
+            // console.log(typeof(currentNode['children']));
+            for (chre in currentNode['children']) {
+                children_list += '<button onclick="jump_to_node(\'' + currentNode['children'][chre] + '\')" type="button" class="mb-1 btn btn-outline-primary">' + e.instance._model.data[currentNode['children'][chre]].text + '</button> '
+
+            }
+            children_list += '<button class="mb-1 btn btn-outline-info" onclick="group_add(\'' + currentNode['id'] + '\')">添加子部门</button>';
+            //console.log(children_list);
+            $("#children_list").html(children_list);
+
+            // 刷新右侧用户列表+++++++++++++++++++++++++++++++++++
+            group_dn = currentNode['id'];
+            //for (let i = 0; i < currentNode.parents.length; i++) {
+            //    if (currentNode.parents[i] !== '#') {
+            //        group_dn += '-' + currentNode.parents[i]
+            //    }
+            //}
+            reload_user_list(group_dn)
+        });
+
+        function refresh_tree() {
+            //刷新部门树的数据
+            $('#tree').jstree(true).refresh(); //刷新
+        }
+
+        function jump_to_node(name) {
+            //跳到指定部门节点
+            this_tree.jstree(true).activate_node(name);
+        }
+
+        function reload_user_list(group_dn) {
+            //根据不同部门刷新用户列表
+            //console.log(group_dn)
+            user_tables.ajax.url('/accounts/ldap/ldap_group_user/{{ pk }}/' + group_dn + '/').load();
+
+        }
+
+
+        /*
+        搜索用户需要输入准确用户，后台返回他的部门，然后定位树；定位用户；比较复杂，暂时不做了
+        function search_user() {
+            //搜索用户，单击后面的按钮触发事件
+            //找到当前用户属于哪个组 第一个组
+            username = $('#search_user').val();
+            jump_to_node('运维部');
+            //datatable过滤当前的用户
+            user_tables.search(username);
+
+
+        }
+        */
+
+        $('#search_user').bind('keypress', function (event) {
+            //搜索用户，input框直接回车触发事件
+            if (event.keyCode === 13) {
+
+            }
+        });
+
+        function group_edit(parent_dn, group_dn) {
+            // 编辑部门
+            // console.log(parent_dn);
+            // console.log(group_dn);
+            layer.open({
+                type: 2,
+                title: '编辑部门',
+                closeBtn: 1,
+                scrollbar: false,
+                area: ['800px', '650px'],
+                shadeClose: false, //点击遮罩关闭
+                content: ['/accounts/ldap/ldap_group_edit/{{ pk }}/' + parent_dn + '/' + group_dn + '/'],
+                end: function () {
+                    var handle_status = $("#handle_status").val();
+                    if (handle_status === '1') {
+                        layer.msg('保存成功！', {
+                            icon: 1,
+                            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            history.go(0);
+                        });
+                    } else if (handle_status === '2') {
+                        layer.msg('修改失败！', {
+                            icon: 2,
+                            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            history.go(0);
+                        });
+                    }
+                }
+            });
+        }
+
+        function group_add(parent_dn) {
+            // 添加一个子部门
+            console.log(parent_dn);
+            layer.open({
+                type: 2,
+                title: '添加子部门',
+                closeBtn: 1,
+                scrollbar: false,
+                area: ['800px', '650px'],
+                shadeClose: false, //点击遮罩关闭
+                content: ['/accounts/ldap/ldap_group_add/{{ pk }}/' + parent_dn + '/'],
+                end: function () {
+                    var handle_status = $("#handle_status").val();
+                    if (handle_status === '1') {
+                        layer.msg('保存成功！', {
+                            icon: 1,
+                            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            history.go(0);
+                        });
+                    } else if (handle_status === '2') {
+                        layer.msg('修改失败！', {
+                            icon: 2,
+                            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            history.go(0);
+                        });
+                    }
+                }
+            });
+        }
+
+        function user_add() {
+            layer.open({
+                type: 2,
+                title: '添加成员',
+                closeBtn: 1,
+                scrollbar: false,
+                area: ['800px', '700px'],
+                shadeClose: false, //点击遮罩关闭
+                content: ['/accounts/ldap/ldap_user_add/{{ pk }}/' + user_parent_dn + '/'],
+                end: function () {
+                    var handle_status = $("#handle_status").val();
+                    if (handle_status === '1') {
+                        layer.msg('保存成功！', {
+                            icon: 1,
+                            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            history.go(0);
+                        });
+                    } else if (handle_status === '2') {
+                        layer.msg('修改失败！', {
+                            icon: 2,
+                            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            history.go(0);
+                        });
+                    }
+                }
+            });
+        }
+
+        function user_edit(cn) {
+            layer.open({
+                type: 2,
+                title: '编辑成员',
+                closeBtn: 1,
+                scrollbar: false,
+                area: ['800px', '700px'],
+                shadeClose: false, //点击遮罩关闭
+                content: ['/accounts/ldap/ldap_user_edit/{{ pk }}/' + cn + '/'],
+                end: function () {
+                    var handle_status = $("#handle_status").val();
+                    if (handle_status === '1') {
+                        layer.msg('保存成功！', {
+                            icon: 1,
+                            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            history.go(0);
+                        });
+                    } else if (handle_status === '2') {
+                        layer.msg('修改失败！', {
+                            icon: 2,
+                            time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function () {
+                            history.go(0);
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,67 @@
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+            LDAP <span>platform</span>
+        </a>
+        <div class="sidebar-toggler not-active">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    <div class="sidebar-body" id="menu">
+        <ul class="nav">
+            <li class="nav-item nav-category">Main</li>
+            <li class="parent-menu nav-item {% if '/' ==  request.path %}active{% endif %}">
+                <a href="/" class="nav-link {% if '/' ==  request.path %}active{% endif %}">
+                    <i class="link-icon" data-feather="box"></i>
+                    <span class="link-title">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item nav-category">web apps</li>
+            <li class="parent-menu nav-item {% if '/personal/' in  request.path %}active{% endif %}">
+                <a class="nav-link" data-toggle="collapse" href="#personal" role="button" aria-expanded="false"
+                   aria-controls="users">
+                    <i class="link-icon" data-feather="user"></i>
+                    <span class="link-title">个人中心</span>
+                    <i class="link-arrow" data-feather="chevron-down"></i>
+                </a>
+                <div class="child-group collapse {% if '/personal/' in  request.path %}show{% endif %}" id="personal">
+                    <ul class="nav sub-menu">
+                        <li class="nav-item">
+                            <a href="/personal/user_profile/"
+                               class="nav-link {% if '/personal/user_profile/' in  request.path %}active{% endif %}">个人信息</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/personal/change_password/"
+                               class="nav-link {% if '/personal/change_password/' in  request.path %}active{% endif %}">修改密码</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            {% if request.user.is_superuser %}
+            <li class="parent-menu nav-item {% if '/accounts/' in  request.path %}active{% endif %}">
+                <a class="nav-link" data-toggle="collapse" href="#users" role="button" aria-expanded="false"
+                   aria-controls="users">
+                    <i class="link-icon" data-feather="users"></i>
+                    <span class="link-title">用户管理</span>
+                    <i class="link-arrow" data-feather="chevron-down"></i>
+                </a>
+                <div class="child-group collapse {% if '/accounts/' in  request.path %}show{% endif %}" id="users">
+                    <ul class="nav sub-menu">
+                        <li class="nav-item">
+                            <a href="/accounts/user/list/"
+                               class="nav-link {% if '/accounts/user/' in  request.path %}active{% endif %}">本地用户</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/accounts/ldapserver/list/"
+                               class="nav-link {% if '/accounts/ldapserver/' in  request.path %}active{% endif %}">LDAP用户</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </li>
+        {% endif %}
+        </ul>
+    </div>
+</nav>

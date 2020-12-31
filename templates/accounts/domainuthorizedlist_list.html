@@ -1,0 +1,55 @@
+{% extends 'common/_base.html' %}
+{% block title %}站点授权{% endblock %}
+{% block content %}
+    <nav class="page-breadcrumb">
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item"><a href="/">首页</a></li>
+						<li class="breadcrumb-item active" aria-current="page">站点授权</li>
+					</ol>
+				</nav>
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+                <h6 class="card-title">站点授权</h6>
+
+                <p class="card-description"><a href="/website/domainthorized/add/" class="btn btn-info btn-sm">添加授权站点</a></p>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>name</th>
+                            <th>mark</th>
+                            <th>domain_name</th>
+                            <th>logout_api_url</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in object_list %}
+                            <tr>
+                                <th>{{ i.id }}</th>
+                                <td>{{ i.name }}</td>
+                                <td>{{ i.mark }}</td>
+                                <td>{{ i.domain_name }}</td>
+                                <td>{{ i.logout_api_url }}</td>
+
+                            <td>
+                                 <a class="hidden-button" title="编辑" href="/website/domainthorized/update/{{ i.id }}"><i
+                                                data-feather="edit" class="icon-sm"> </i></a>
+                                        &nbsp
+                                        <a class="hidden-button" title="删除" href="javascript:void(0);" onclick="object_delete('/website/domainthorized','{{ i.id }}')"><i
+                                                data-feather="x" class="icon-sm"> </i></a>
+                            </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

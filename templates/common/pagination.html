@@ -1,0 +1,92 @@
+{% if is_paginated %}
+
+    <nav aria-label="Score pagination" class="mb-4">
+         <ul class="pagination">
+             {% if page_obj.has_previous %}
+             <li class="page-item">
+                 <a class="page-link" href="?page={{ page_obj.previous_page_number }}">上一页</a>
+             </li>
+             {% else %}
+             <li class="page-item disabled">
+                 <span class="page-link">上一页</span>
+             </li>
+             {% endif %}
+                <!--首页-->
+                {% if page_obj.number == 1 %}
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ page_obj.number }}
+                            <span class="sr-only">(current)</span>
+                        </span>
+                    </li>
+                {% else %}
+                      <li class="page-item">
+                          <a class="page-link" href="?page=1">1</a>
+                      </li>
+                {% endif %}
+
+              {% for page_num in paginator.page_range %}
+                  {% if page_num != 1 and page_num != paginator.num_pages %}
+
+                    {% if page_obj.number == page_num %}
+                        <li class="page-item active">
+                            <span class="page-link">
+                                {{ page_num }}
+                                <span class="sr-only">(current)</span>
+                            </span>
+                        </li>
+                        <!--向前三页-->
+                    {% elif page_obj.number|add:-3 == page_num %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                    {% elif page_obj.number|add:-2 == page_num %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                    {% elif page_obj.number|add:-1 == page_num %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                        <!--向后三页-->
+                    {% elif page_obj.number|add:3 == page_num %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                    {% elif page_obj.number|add:2 == page_num %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                    {% elif page_obj.number|add:1 == page_num %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                <!--最后一页-->
+                {% if page_obj.number == paginator.num_pages %}
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ paginator.num_pages }}
+                            <span class="sr-only">(current)</span>
+                        </span>
+                    </li>
+                {% else %}
+                      <li class="page-item">
+                          <a class="page-link" href="?page={{ paginator.num_pages }}">{{ paginator.num_pages }}</a>
+                      </li>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">下一页</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">下一页</span>
+                    </li>
+                {% endif %}
+         </ul>
+    </nav>
+    {% endif %}

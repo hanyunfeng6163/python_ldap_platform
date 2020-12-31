@@ -1,0 +1,180 @@
+{% extends 'common/_layer.html' %}
+{% load static %}
+{% block localcss %}
+    <link rel="stylesheet" href="{% static 'plugins/combo-tree/css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/combo-tree/css/style.css' %}">
+{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">添加成员</h6>
+                    <form class="forms-sample" method="post">
+
+                         <div class="form-group">
+                            <label>部门(可多选)：</label>
+                            <input type="text" id="user_group" class="form-control"
+                                   autocomplete="off" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label><span  style="color: red;">*</span>CN：</label>
+                            <input type="text" id="cn" class="form-control  col-md-4" id=""
+                                   autocomplete="off" placeholder="如：zhangsan" value="" >
+                            <span style="color: #e8ebf1;">建议和邮箱前缀一致，同名用户可以自定义英文全拼</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label><span  style="color: red;">*</span>邮箱：</label>
+                            <div class="row col-md-12">
+                                <input type="text" id="email_prefix" class="form-control col-md-4" id=""
+                                       autocomplete="off"
+                                       placeholder="填入邮箱前缀，如：zhangsan"
+                                        required>
+                                <select class="form-control col-md-3" id="email_suffix">
+                                    <option selected value="ttjianbao.com">ttjianbao.com</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>中文名：</label>
+                            <input type="text" id="display_name" class="form-control  col-md-4" id=""
+                                   autocomplete="off" placeholder="如：张三" value="" >
+                        </div>
+
+
+                        <div class="form-group">
+                            <label>电话：</label>
+                            <input type="text" id="phone" class="form-control col-md-6" id="" autocomplete="off"
+                                   placeholder="11位手机号" data-inputmask-alias="19999999999" value="">
+                        </div>
+                        <button type="button" onclick="commit_data()" class="btn btn-primary mr-2">提交</button>
+                        <input type="button" class="btn btn-warning" name="close" value="关闭"
+                               onclick="parent.layer.close(parent.layer.getFrameIndex(window.name));"/>
+
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block localjs %}
+    <!--弃用 <script src="{% static 'plugins/combo-tree/js/icontains.js' %}"></script> -->
+    <script src="{% static 'plugins/combo-tree/js/comboTreePlugin.js' %}"></script>
+
+    <script type="text/javascript">
+
+        var index = parent.layer.getFrameIndex(window.name);
+
+
+        function ldap_group_form_tree() {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "get",
+                url: '/accounts/ldap/ldap_user_form_tree/{{ pk }}/',
+                datatype: 'json',
+                success: function (data) {
+                    //console.log(typeof(data));
+                    // result = JSON.parse(data);
+                    result = JSON.parse(JSON.stringify(data));
+                    console.log(result)
+                }
+            });
+            return result
+        }
+
+
+        let SampleJSONData = ldap_group_form_tree();
+
+        var comboTree1, comboTree2;
+
+        jQuery(document).ready(function ($) {
+
+            comboTree1 = $('#justAnInputBox').comboTree({
+                source: SampleJSONData,
+                isMultiple: true
+            });
+
+            comboTree2 = $('#user_group').comboTree({
+                source: SampleJSONData,
+                isMultiple: true,
+                selected: ['{{ user_parent_dn }}'],
+
+            });
+
+        });
+
+
+
+        function commit_data() {
+            let email_prefix = $('#email_prefix').val();
+            let email_suffix = $('#email_suffix').val();
+            let display_name = $('#display_name').val();
+            let phone = $('#phone').val();
+            let cn = $('#cn').val();
+            let user_group = JSON.stringify(comboTree2.getSelectedIds());
+
+            if (email_prefix === ''){
+                layer.msg('邮箱前缀不能为空', {icon: 2});
+                return
+            }
+            if (cn === ''){
+                layer.msg('英文全拼不能为空', {icon: 2});
+                return
+            }
+            if (display_name === ''){
+                layer.msg('中文名不能为空', {icon: 2});
+                return
+            }
+            if (phone === ''){
+                phone = '1'
+            }
+            $.ajax({
+                    url: '/accounts/ldap/ldap_user_add/{{ pk }}/{{ user_parent_dn }}/',
+                    method: 'post',
+                    type: 'json',
+                    data: {
+                        user_group: user_group,//用户部门
+                        email_prefix: email_prefix,//邮箱前缀
+                        email_suffix: email_suffix,//邮箱后缀
+                        display_name: display_name,//中文名
+                        phone: phone,//手机号
+                        cn: cn,
+                    },
+                    success: function (data) {
+                        if (data.status === 0) {
+                            // 提示密码
+                            layer.alert('密码为：'+data['pwd']+'</br><div style="color:red">请确保妥善保存此密码,您无法再次查询此密码</div>', {
+                                icon: 1,
+                                title: '用户新建成功',
+                                end: function () {
+                                    parent.location.reload(index);
+                                }
+
+
+                            // 不提示密码
+                            // layer.msg('成功', {
+                            //    icon: 1,
+                            //    time: 1500,
+                            //    end: function () {
+                            //        parent.location.reload(index);
+                            //    }
+                            });
+                        } else {
+                            layer.msg('创建失败<br>'+data.msg, {icon: 2});
+
+                        }
+                    },
+                    error: function (data) {
+                        layer.msg('提交失败', {icon: 2});
+                    }
+                }
+            )
+        }
+    </script>
+{% endblock %}
