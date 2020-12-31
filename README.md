@@ -19,16 +19,13 @@ https://hanyunfeng.coding.net/public/public/python_ldap_platform/git/files
 <img width="800" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/修改密码.png"> 
 
 ###### ldap列表
-<img width="800" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/ldap列表.png"> 
+<img width="800" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/ldap列表1.png"> 
 
 ###### ldap管理页
 <img width="800" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/ldap管理页.png"> 
 
 ###### ldap用户编辑
-<img width="500" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/编辑成员.png"> 
-
-###### 忘记密码
-<img width="400" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/忘记密码.png"> 
+<img width="500" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/ldap用户编辑.png"> 
 
 ###### 重置密码邮件
 <img width="800" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/重置密码邮件.png"> 
