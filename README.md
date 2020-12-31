@@ -42,7 +42,7 @@ https://hanyunfeng.coding.net/public/public/python_ldap_platform/git/files
 
 ## screenshots
 ###### 登录
-<img width="400" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/登录.png"> 
+<img width="400" src="http://81.68.127.45:90/screenshots/登录.png"> 
 
 ###### 个人信息
 <img width="800" src="https://hanyunfeng.coding.net/p/public/d/python_ldap_platform/git/raw/main/screenshots/个人信息.png"> 
