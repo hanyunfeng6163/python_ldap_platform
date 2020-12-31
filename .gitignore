@@ -1,5 +1,6 @@
 ### Django ###
 online.conf
+.DS_Store
 
 *.log
 *.pot
