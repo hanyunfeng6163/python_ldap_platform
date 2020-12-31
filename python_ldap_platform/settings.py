@@ -286,7 +286,7 @@ MVX0zMCP+m5Mp7jrDnZIG1fT/jVuzkbQed9WhofpYv3R6zzKo1w=
 
 DOMAIN_NAME = config.get('base', 'DOMAIN_NAME')
 SITE_NAME = config.get('base', 'SITE_NAME')
-
+DOMAIN_SUFFIX = config.get('ldap', 'DOMAIN_SUFFIX')
 
 
 

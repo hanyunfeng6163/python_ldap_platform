@@ -32,8 +32,8 @@
                                        placeholder="填入邮箱前缀，如：zhangsan"
                                        value="{{ email_prefix }}">
                                 <select class="form-control col-md-3" id="email_suffix">
-                                    <option {% if email_suffix == 'ttjianbao.com' %} selected {% endif %}
-                                                                                   value="ttjianbao.com">ttjianbao.com
+                                    <option {% if email_suffix == DOMAIN_SUFFIX %} selected {% endif %}
+                                                                                   value="{{ DOMAIN_SUFFIX }}">{{ DOMAIN_SUFFIX }}
                                     </option>
                                 </select>
                             </div>

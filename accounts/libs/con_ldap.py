@@ -117,9 +117,7 @@ def update_menu_tree_json(d, group_dn, upper_key=''):
 
 
 class AD(object):
-    def __init__(self, host, port, user, password, ldap_server='openladp', use_ssl=False,
-                 people_base='ou=People,dc=ttjianbao,dc=com',
-                 group_base='ou=Group,dc=ttjianbao,dc=com',
+    def __init__(self, host, port, user, password, base_dn, ldap_server='openladp', use_ssl=False,
                  ldap_user_object_class='inetOrgPerson',
                  ldap_group_object_class='groupOfUniqueNames',):
         if ldap_server == 'windows_ad':
@@ -143,8 +141,8 @@ class AD(object):
 
         self.server = _server
 
-        self.people_base = people_base  # 用户
-        self.group_base = group_base  # 组
+        self.people_base = 'ou=People,{base_dn}'.format(base_dn=base_dn)  # 用户
+        self.group_base = 'ou=Group,{base_dn}'.format(base_dn=base_dn)  # 组
         self.ldap_user_object_class = ldap_user_object_class
         self.ldap_group_object_class = ldap_group_object_class
 
@@ -488,7 +486,7 @@ class AD(object):
 
 
 if __name__ == '__main__':
-    ad = AD(host='81.68.127.45', port=389, user='cn=Manager,dc=10dream,dc=com', password='xiangyun6163654')
+    ad = AD(host='', port=389, user='cn=Manager,dc=10dream,dc=com', password='', base_dn='dc=xxx,dc=com')
     # print(ad.get_group_list())
     # print(ad.search_group_user_list())
     # print(ad.search_user_info(cn='dengyong'))

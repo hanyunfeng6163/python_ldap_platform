@@ -107,7 +107,7 @@ def ldap_auth(request, ldapserver_id, username, password):
     """
     l_s = LdapServer.objects.get(id=ldapserver_id)
     try:
-        ad = AD(host=l_s.host, port=l_s.port, user=l_s.user, password=rsa_decrypt(l_s.password))
+        ad = AD(host=l_s.host, port=l_s.port, user=l_s.user, password=rsa_decrypt(l_s.password), base_dn=l_s.ldap_base_dn)
     except Exception as e:
         logger.error(e)
         return False, '认证服务器连接失败'

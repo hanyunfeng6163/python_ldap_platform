@@ -10,5 +10,6 @@ def global_setting(request):
     return {
         'SITE_NAME': settings.SITE_NAME,  # 网站名称
         'DOMAIN_NAME': settings.DOMAIN_NAME,  # 网站地址
+        'DOMAIN_SUFFIX': settings.DOMAIN_SUFFIX, # 域名后缀
     }
 

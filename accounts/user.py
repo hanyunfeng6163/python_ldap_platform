@@ -66,7 +66,8 @@ def change_password(request):
             # 校验旧密码是否正确
             l_s = LdapServer.objects.get(id=request.user.login_info.ldap_server)
             try:
-                ad = AD(host=l_s.host, port=l_s.port, user=l_s.user, password=rsa_decrypt(l_s.password))
+                ad = AD(host=l_s.host, port=l_s.port, user=l_s.user, password=rsa_decrypt(l_s.password),
+                        base_dn=l_s.ldap_base_dn)
             except Exception as e:
                 logger.error(e)
                 return False, '认证服务器连接失败'
