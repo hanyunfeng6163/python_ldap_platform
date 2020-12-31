@@ -8,21 +8,21 @@
 
 # ldap配置前提
 ```
-# 条目 1: ou=Group,dc=ttjianbao,dc=com
-dn: ou=Group,dc=ttjianbao,dc=com
+# 条目 1: ou=Group,dc=domain,dc=com
+dn: ou=Group,dc=domain,dc=com
 objectclass: top
 objectclass: organizationalUnit
 ou: Group
 
 
-# 条目 1: ou=People,dc=ttjianbao,dc=com
-dn: ou=People,dc=ttjianbao,dc=com
+# 条目 1: ou=People,dc=domain,dc=com
+dn: ou=People,dc=domain,dc=com
 objectclass: top
 objectclass: organizationalUnit
 ou: People
 ```
 
-# 使用
+# 简单安装
 **参考example.conf 在根目录创建online.conf 修改所需要的配置**
 ```shell
 # 依赖安装
