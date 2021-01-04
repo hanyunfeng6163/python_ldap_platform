@@ -110,6 +110,14 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     success_url = '/accounts/user/list/'
     template_name = 'accounts/user_form_update.html'
 
+    def post(self, request, **kwargs):
+        request.POST = request.POST.copy()
+        # print(request.POST.getlist('roles'))
+        # 开发和测试角色，全部更新jenkins的权限
+        # 开发角色分配Yearing角色权限
+        # 开发角色创建阿里云账号，并授权部分只读权限
+        return super(UserUpdateView, self).post(request, **kwargs)
+
 
 class DomainuthorizedListCreateView(LoginRequiredMixin, CreateView):
     model = DomainuthorizedList

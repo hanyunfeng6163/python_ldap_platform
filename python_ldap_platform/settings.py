@@ -289,6 +289,10 @@ SITE_NAME = config.get('base', 'SITE_NAME')
 DOMAIN_SUFFIX = config.get('ldap', 'DOMAIN_SUFFIX')
 
 
+# jenkins配置
+JENKINS_URL = config.get('jenkins', 'JENKINS_URL')
+JENKINS_USERNAME = config.get('jenkins', 'JENKINS_USERNAME')
+JENKINS_PASSWORD = config.get('jenkins', 'JENKINS_PASSWORD')
 
 
 
