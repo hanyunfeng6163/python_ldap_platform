@@ -79,12 +79,10 @@ except ImportError:
         def emit(self, record):
             pass
 
-
 logging.getLogger(__name__).addHandler(NullHandler())
 
 if sys.version_info < (2, 7, 0):
     warnings.warn("Support for python 2.6 is deprecated and will be removed.")
-
 
 LAUNCHER_SSH = 'hudson.plugins.sshslaves.SSHLauncher'
 LAUNCHER_COMMAND = 'hudson.slaves.CommandLauncher'
@@ -120,9 +118,9 @@ BUILD_WITH_PARAMS_JOB = '%(folder_url)sjob/%(short_name)s/buildWithParameters'
 BUILD_INFO = '%(folder_url)sjob/%(short_name)s/%(number)d/api/json?depth=%(depth)s'
 BUILD_CONSOLE_OUTPUT = '%(folder_url)sjob/%(short_name)s/%(number)d/consoleText'
 BUILD_ENV_VARS = '%(folder_url)sjob/%(short_name)s/%(number)d/injectedEnvVars/api/json' + \
-    '?depth=%(depth)s'
+                 '?depth=%(depth)s'
 BUILD_TEST_REPORT = '%(folder_url)sjob/%(short_name)s/%(number)d/testReport/api/json' + \
-    '?depth=%(depth)s'
+                    '?depth=%(depth)s'
 DELETE_BUILD = '%(folder_url)sjob/%(short_name)s/%(number)s/doDelete'
 WIPEOUT_JOB_WORKSPACE = '%(folder_url)sjob/%(short_name)s/doWipeOutWorkspace'
 NODE_LIST = 'computer/api/json?depth=%(depth)s'
@@ -145,13 +143,13 @@ DELETE_PROMOTION = '%(folder_url)sjob/%(short_name)s/promotion/process/%(name)s/
 CREATE_PROMOTION = '%(folder_url)sjob/%(short_name)s/promotion/createProcess?name=%(name)s'
 CONFIG_PROMOTION = '%(folder_url)sjob/%(short_name)s/promotion/process/%(name)s/config.xml'
 LIST_CREDENTIALS = '%(folder_url)sjob/%(short_name)s/credentials/store/folder/' \
-                    'domain/%(domain_name)s/api/json?tree=credentials[id]'
+                   'domain/%(domain_name)s/api/json?tree=credentials[id]'
 CREATE_CREDENTIAL = '%(folder_url)sjob/%(short_name)s/credentials/store/folder/' \
                     'domain/%(domain_name)s/createCredentials'
 CONFIG_CREDENTIAL = '%(folder_url)sjob/%(short_name)s/credentials/store/folder/' \
                     'domain/%(domain_name)s/credential/%(name)s/config.xml'
 CREDENTIAL_INFO = '%(folder_url)sjob/%(short_name)s/credentials/store/folder/' \
-                    'domain/%(domain_name)s/credential/%(name)s/api/json?depth=0'
+                  'domain/%(domain_name)s/credential/%(name)s/api/json?depth=0'
 QUIET_DOWN = 'quietDown'
 GET_ROLE = 'role-strategy/strategy/getRole?type=%(type_name)s&roleName=%(role_name)s'
 ASSIGN_ROLE = 'role-strategy/strategy/assignRole'
@@ -1286,7 +1284,7 @@ class Jenkins(object):
         if parameters:
             if token:
                 if isinstance(parameters, list):
-                    parameters.append(('token', token, ))
+                    parameters.append(('token', token,))
                 elif isinstance(parameters, dict):
                     parameters.update({'token': token})
                 else:
@@ -1380,10 +1378,10 @@ class Jenkins(object):
         # using a groovy script because Jenkins does not provide a REST endpoint
         # for installing plugins.
         install = ('Jenkins.instance.updateCenter.getPlugin(\"' + name + '\")'
-                   '.deploy();')
+                                                                         '.deploy();')
         if include_dependencies:
             install = ('Jenkins.instance.updateCenter.getPlugin(\"' + name + '\")'
-                       '.getNeededDependencies().each{it.deploy()};') + install
+                                                                             '.getNeededDependencies().each{it.deploy()};') + install
 
         self.run_script(install)
         # run_script is an async call to run groovy. we need to wait a little
@@ -1416,7 +1414,7 @@ class Jenkins(object):
         """
         folder_url, short_name = self._get_job_folder(name)
         self.jenkins_open(requests.Request('POST',
-                          self._build_url(DELETE_BUILD, locals()), b''))
+                                           self._build_url(DELETE_BUILD, locals()), b''))
 
     def wipeout_job_workspace(self, name):
         """Wipe out workspace for given Jenkins job.
@@ -1425,8 +1423,8 @@ class Jenkins(object):
         """
         folder_url, short_name = self._get_job_folder(name)
         self.jenkins_open(requests.Request('POST',
-                          self._build_url(WIPEOUT_JOB_WORKSPACE,
-                                          locals()), b''))
+                                           self._build_url(WIPEOUT_JOB_WORKSPACE,
+                                                           locals()), b''))
 
     def get_running_builds(self):
         '''Return list of running builds.
@@ -1611,7 +1609,7 @@ class Jenkins(object):
             'mode': mode,
             'retentionStrategy': {
                 'stapler-class':
-                'hudson.slaves.RetentionStrategy$Always'
+                    'hudson.slaves.RetentionStrategy$Always'
             },
             'nodeProperties': {'stapler-class-bag': 'true'},
             'launcher': launcher_params
@@ -1860,7 +1858,7 @@ class Jenkins(object):
 
     def assert_promotion_exists(self, name, job_name,
                                 exception_message='promotion[%s] does not '
-                                'exist for job[%s]'):
+                                                  'exist for job[%s]'):
         '''Raise an exception if a job lacks a promotion
 
         :param name: Name of Jenkins promotion, ``str``
@@ -1943,7 +1941,7 @@ class Jenkins(object):
             'POST', self._build_url(CREATE_PROMOTION, locals()),
             data=config_xml.encode('utf-8'), headers=DEFAULT_HEADERS))
         self.assert_promotion_exists(name, job_name, 'create[%s] at '
-                                     'job[%s] failed')
+                                                     'job[%s] failed')
 
     def reconfig_promotion(self, name, job_name, config_xml):
         '''Change configuration of existing Jenkins promotion.
@@ -2010,11 +2008,11 @@ class Jenkins(object):
         :returns: ``True`` if job is folder, ``False`` otherwise
         '''
         return 'com.cloudbees.hudson.plugins.folder.Folder' \
-            == self.get_job_info(name)['_class']
+               == self.get_job_info(name)['_class']
 
     def assert_credential_exists(self, name, folder_name, domain_name='_',
                                  exception_message='credential[%s] does not '
-                                 'exist in the domain[%s] of [%s]'):
+                                                   'exist in the domain[%s] of [%s]'):
         '''Raise an exception if credential does not exist in domain of folder
 
         :param name: Name of credential, ``str``
@@ -2087,7 +2085,7 @@ class Jenkins(object):
         folder_url, short_name = self._get_job_folder(folder_name)
         return self.jenkins_open(requests.Request(
             'GET', self._build_url(CONFIG_CREDENTIAL, locals())
-            ))
+        ))
 
     def create_credential(self, folder_name, config_xml,
                           domain_name='_'):
@@ -2123,7 +2121,7 @@ class Jenkins(object):
         folder_url, short_name = self._get_job_folder(folder_name)
         self.jenkins_open(requests.Request(
             'DELETE', self._build_url(CONFIG_CREDENTIAL, locals())
-            ))
+        ))
         if self.credential_exists(name, folder_name, domain_name):
             raise JenkinsException('delete credential[%s] from '
                                    'domain[%s] of [%s] failed'
@@ -2254,17 +2252,37 @@ class Jenkins(object):
             raise BadHTTPException("Error communicating with server[%s]" % self.server)
 
     def assign_role(self, type_name, role_name, sid):
+        """
+        给用户分配角色
+        :param type_name: projectRoles or globalRoles
+        :param role_name: READ
+        :param sid: 用户sid
+        :return:
+        """
+        url = self._build_url(ASSIGN_ROLE, locals())
+        data = {
+            "type": type_name,
+            "roleName": role_name,
+            "sid": sid
+        }
         try:
-            response = self.jenkins_open(requests.Request(
-                'GET', self._build_url(ASSIGN_ROLE, locals())
-            ))
-            if response:
-                return json.loads(response)
-            else:
-                raise JenkinsException('get_role error')
-
-        except (req_exc.HTTPError, BadStatusLine):
-            raise BadHTTPException("Error communicating with server[%s]" % self.server)
+            response = self.jenkins_request(requests.Request('POST', url, data=data))
+        except Exception as e:
+            raise JenkinsException('assign_role error')
 
     def delete_sid(self, type_name, sid):
-        pass
+        """
+        从角色组里移除用户
+        :param type_name: projectRoles or globalRoles
+        :param sid: 用户sid
+        :return:
+        """
+        url = self._build_url(DELETE_SID, locals())
+        data = {
+            "type": type_name,
+            "sid": sid
+        }
+        try:
+            response = self.jenkins_request(requests.Request('POST', url, data=data))
+        except Exception as e:
+            raise JenkinsException('delete_sid error')
