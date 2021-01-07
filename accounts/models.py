@@ -37,6 +37,22 @@ class Role(models.Model):
     """
     title = models.CharField(verbose_name='角色名称', max_length=32, unique=True)
     mark = models.CharField(verbose_name='角色代号', max_length=20, unique=True)
+    external_permission = models.ManyToManyField(verbose_name='拥有的权限', to='ExternalPermission', blank=True)
+
+    def __str__(self):
+        return self.title
+
+
+class ExternalPermission(models.Model):
+    """
+    外置权限表
+    """
+    title = models.CharField(verbose_name='权限名称名称', max_length=32, unique=True)
+    mark = models.CharField(verbose_name='权限简称', max_length=20, unique=True)
+
+    class Meta:
+        verbose_name = u'外部权限表'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.title

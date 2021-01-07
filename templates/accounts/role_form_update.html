@@ -2,6 +2,8 @@
 {% block title %}更新角色{% endblock %}
 {% block localcss %}
     <link rel="stylesheet" href="/static/assets/vendors/select2/select2.min.css">
+    <link rel="stylesheet" href="/static/assets/fonts/glyphicons/bootstrap-my.css">
+    <link rel="stylesheet" href="/static/assets/vendors/jquery-bootstrap-duallistbox/bootstrap-duallistbox.css">
     <link rel="stylesheet" href="/static/assets/css/style.css">
 {% endblock %}
 {% block content %}
@@ -34,4 +36,16 @@
 {% block localjs %}
     <script src="/static/assets/vendors/select2/select2.full.min.js"></script>
     <script src="/static/assets/js/select2.js"></script>
+
+    <script src="/static/assets/vendors/jquery-bootstrap-duallistbox/jquery.bootstrap-duallistbox.js"></script>
+    <script>
+        var demo1 = $('select[name="external_permission"]').bootstrapDualListbox({
+          nonSelectedListLabel: null,
+          selectedListLabel: null,
+            infoText: false,
+          preserveSelectionOnMove: 'moved',
+          moveOnSelect: false,
+            showFilterInputs: false,
+        });
+    </script>
 {% endblock %}

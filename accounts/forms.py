@@ -6,10 +6,11 @@ from accounts.models import Role, User, DomainuthorizedList, LdapServer
 class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
-        fields = ('title', 'mark')
+        fields = ('title', 'mark', 'external_permission')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control col-sm-4'}),
             'mark': forms.TextInput(attrs={'class': 'form-control col-sm-4'}),
+            'external_permission': forms.SelectMultiple(attrs={'class': 'form-control demo2', 'size': '10', 'multiple': 'multiple'}),
         }
 
 
