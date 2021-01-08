@@ -8,3 +8,4 @@ pypinyin==0.39.1
 pymysql==1.0.1
 aliyunsdkcore==1.0.3
 aliyun-python-sdk-ram==3.2.0
+multi_key_dict

@@ -129,5 +129,5 @@ nohup.out
 # assemblyline/migrations/0*
 .vscode/settings.json
 .vscode/
-/logs
+/logs/*
 /accounts/migrations/
