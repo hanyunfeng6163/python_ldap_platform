@@ -2,7 +2,7 @@ from django.urls import path
 
 from accounts.fronts import UserListView, RoleListView, LdapServerListView, role_delete, RoleCreateView, RoleUpdateView, \
     UserUpdateView, UserCreateView, user_delete, LdapServerCreateView, ldapserver_delete, LdapServerUpdateView, \
-    ldapserver_detail
+    ldapserver_detail, ldap_user_add_to_local
 from accounts.ldap_view import ldap_tree, ldap_all_user, ldap_group_user, ldap_group_edit, ldap_group_form_tree, \
     ldap_group_add, ldap_user_add, ldap_user_form_tree, ldap_user_edit, ldap_user_delete, send_forget_password_email, \
     email_reset_password, page_wait, ldap_user_reset_password
@@ -23,6 +23,8 @@ urlpatterns = [
     path('user/delete/<int:pk>/', user_delete, name='user_delete'),
     path('user/add/', UserCreateView.as_view(), name='user_add'),
     path('user/update/<int:pk>', UserUpdateView.as_view(), name='user_update'),
+    path('user/ldap_user_add_to_local/', ldap_user_add_to_local, name='ldap_user_add_to_local'),
+
     # ldap detail页面
     path('ldap/ldap_tree/<int:pk>/', ldap_tree, name='ldap_tree'),
     path('ldap/ldap_all_user/<int:pk>/', ldap_all_user, name='ldap_all_user'),

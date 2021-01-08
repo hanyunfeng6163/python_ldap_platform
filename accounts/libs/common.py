@@ -107,7 +107,8 @@ def ldap_auth(request, ldapserver_id, username, password):
     """
     l_s = LdapServer.objects.get(id=ldapserver_id)
     try:
-        ad = AD(host=l_s.host, port=l_s.port, user=l_s.user, password=rsa_decrypt(l_s.password), base_dn=l_s.ldap_base_dn)
+        ad = AD(host=l_s.host, port=l_s.port, user=l_s.user, password=rsa_decrypt(l_s.password),
+                base_dn=l_s.ldap_base_dn)
     except Exception as e:
         logger.error(e)
         return False, '认证服务器连接失败'
@@ -119,7 +120,7 @@ def ldap_auth(request, ldapserver_id, username, password):
         _user = get_or_none(User, username=username)
         if _user is None:
             _user = User.objects.create(username=username, nickname=user_info['nickname'], email=user_info['email'],
-                                phone=user_info['phone'], source='ldap')
+                                        phone=user_info['phone'], source='ldap')
         # 验证用户是否锁定
         interceptor_user = auth_interceptor(_user)
         if not interceptor_user[0]:
@@ -290,8 +291,62 @@ def get_or_none(model, *args, **kwargs):
 
 class IsAdminMixin(View):
     def dispatch(self, request, *args, **kwargs):
-       if not request.user.is_superuser:
-           return redirect("page_wait", content='您没有此页面权限')
-       else:
-           return super().dispatch(request, *args, **kwargs)
+        if not request.user.is_superuser:
+            return redirect("page_wait", content='您没有此页面权限')
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
+
+def send_ali_password(username, nickname, email, password):
+    email_content_template = '<html><body>{nickname},您好：' \
+                             '<br>我们为你开通了阿里云子账号!' \
+                             '<br><br>用户名: {username}' \
+                             '<br>密码: {password}' \
+                             '<br><br>当您第一次登陆的时候，我们会要求您重置密码' \
+                             '<br><br>Thanks,<br>The Ops Team<body></html>'
+    subject = '[运维通知] 阿里云子账号开通提醒'
+    sender = settings.EMAIL_FROM  # 发送邮箱，已经在settings.py设置，直接导入
+    receiver = [email]  # 目标邮箱
+    html_message = email_content_template.format(username=username, nickname=nickname, password=password)  # 发送html格式
+
+    try:
+        print(subject)
+        print(sender, receiver)
+        send_result = send_mail(subject=subject, from_email=sender, html_message=html_message, recipient_list=receiver,
+                                message='')
+        print(send_result)
+        if send_result == 1:
+            # 提示邮件已发送，并跳转到登录页面
+            return True
+        else:
+            return False
+    except Exception as e:
+        logger.error(e)
+        return False
+
+
+def send_ldap_password(username, nickname, email, password):
+    email_content_template = '<html><body>{nickname},您好：' \
+                             '<br>我们为您开通了统一账号，您可以使用此账号登录内部gitlab、jenkins、堡垒机等平台!' \
+                             '<br><br>用户名: {username}' \
+                             '<br>密码: {password}' \
+                             '<br><br>Thanks,<br>The Ops Team<body></html>'
+    subject = '[运维通知] 统一账号开通提醒'
+    sender = settings.EMAIL_FROM  # 发送邮箱，已经在settings.py设置，直接导入
+    receiver = [email]  # 目标邮箱
+    html_message = email_content_template.format(username=username, nickname=nickname, password=password)  # 发送html格式
+
+    try:
+        print(subject)
+        print(sender, receiver)
+        send_result = send_mail(subject=subject, from_email=sender, html_message=html_message, recipient_list=receiver,
+                                message='')
+        print(send_result)
+        if send_result == 1:
+            # 提示邮件已发送，并跳转到登录页面
+            return True
+        else:
+            return False
+    except Exception as e:
+        logger.error(e)
+        return False

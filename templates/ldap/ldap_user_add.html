@@ -149,21 +149,38 @@
                     success: function (data) {
                         if (data.status === 0) {
                             // 提示密码
-                            layer.alert('密码为：'+data['pwd']+'</br><div style="color:red">请确保妥善保存此密码,您无法再次查询此密码</div>', {
-                                icon: 1,
-                                title: '用户新建成功',
-                                end: function () {
-                                    parent.location.reload(index);
-                                }
-
-
-                            // 不提示密码
-                            // layer.msg('成功', {
-                            //    icon: 1,
-                            //    time: 1500,
-                            //    end: function () {
-                            //        parent.location.reload(index);
-                            //    }
+                            // layer.confirm('密码为：'+data['pwd']+'</br><div style="color:red">请确保妥善保存此密码,您无法再次查询此密码</div>', {
+                            layer.confirm('ldap用户创建成功，密码已通过邮件发送', {
+                                btn: ['继续角色配置', '结束'],
+                                title: false,
+                                closeBtn: false,
+                            }, function () {
+                                // 自动在本地创建此用户，然后跳转到编辑页面
+                                $.ajax({
+                                        url: '/accounts/user/ldap_user_add_to_local/',
+                                        method: 'post',
+                                        type: 'json',
+                                        data: {
+                                            email_prefix: email_prefix,//邮箱前缀
+                                            email_suffix: email_suffix,//邮箱后缀
+                                            display_name: display_name,//中文名
+                                            cn: cn,
+                                        },
+                                        success: function (data) {
+                                            if (data.status === 0) {
+                                                var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                                                parent.layer.close(index);
+                                                window.parent.location.replace("/accounts/user/update/"+data.aid);
+                                            }
+                                        },
+                                        error: function (data) {
+                                            layer.msg('提交失败', {icon: 2});
+                                        }
+                                    }
+                                )
+                            }, function () {
+                                // layer.msg('已取消', {icon: 0});
+                                parent.location.reload(index);
                             });
                         } else {
                             layer.msg('创建失败<br>'+data.msg, {icon: 2});

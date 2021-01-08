@@ -303,6 +303,10 @@ Y_PASSWORD = config.get('yearning', 'password')
 Y_DATABASE = config.get('yearning', 'database')
 
 
+# aly配置
+ACCESS_ID = config.get('aliyun', 'access_id')
+ACCESS_KEY = config.get('aliyun', 'access_key')
+
 
 
 

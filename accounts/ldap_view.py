@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+from accounts.libs.common import send_ldap_password
 from accounts.libs.con_ldap import AD, group_dn_magic, group_dn_magic_re
 from accounts.models import LdapUserEmailVerifyRecord, LdapServer
 from common.lib import random_str, rsa_decrypt
@@ -169,6 +170,7 @@ def ldap_user_add(request, pk, user_parent_dn):
                 ad.group_add_user(cns, attr={'uniqueMember': dn})
         except Exception as e:
             logger.error(e)
+        send_ldap_password(username=cn, nickname=display_name, email=mail, password=new_password)
         return JsonResponse({'status': 0, 'pwd':new_password})
     return render(request, 'ldap/ldap_user_add.html', locals())
 
@@ -290,6 +292,7 @@ def ldap_user_delete(request, pk, cn):
         return JsonResponse({'status': 0})
     else:
         return JsonResponse({'status': 1})
+
 
 
 @login_required

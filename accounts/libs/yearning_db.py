@@ -46,6 +46,8 @@ def yearning_op_del(username, nickname, email):
 
     try:
         with connect.cursor() as cursor:  # 创建游标
+            sql = "DELETE FROM dba_audit.core_accounts WHERE username = '{username}'".format(username=username)
+            cursor.execute(sql)
             sql1 = "DELETE FROM dba_audit.core_graineds WHERE username = '{username}'".format(username=username)
             cursor.execute(sql1)
     except Exception as e:

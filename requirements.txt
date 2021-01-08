@@ -6,3 +6,5 @@ ldap3==2.8.1
 rsa==4.6
 pypinyin==0.39.1
 pymysql==1.0.1
+aliyunsdkcore==1.0.3
+aliyun-python-sdk-ram==3.2.0
