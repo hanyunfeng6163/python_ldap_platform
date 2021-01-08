@@ -71,7 +71,7 @@
                                         </form>
                                     </div>
                                     {% endfor %}
-                                 <div id="standard" class="container tab-pane fade"><br>
+                                 <div id="standard" class="container tab-pane {% if not l_s %} active {% else %} fade {% endif %}"><br>
                                         <form class="forms-sample" method="post">
                                             <div class="form-group">
                                                 <label>Username</label>
