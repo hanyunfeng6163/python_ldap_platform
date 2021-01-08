@@ -64,7 +64,7 @@ from six.moves.urllib.error import URLError
 from six.moves.urllib.parse import quote, urlencode, urljoin, urlparse
 import xml.etree.ElementTree as ET
 
-from jenkins import plugins
+from accounts.libs.jenkins import plugins
 
 try:
     import requests_kerberos
@@ -153,6 +153,7 @@ CREDENTIAL_INFO = '%(folder_url)sjob/%(short_name)s/credentials/store/folder/' \
 QUIET_DOWN = 'quietDown'
 GET_ROLE = 'role-strategy/strategy/getRole?type=%(type_name)s&roleName=%(role_name)s'
 ASSIGN_ROLE = 'role-strategy/strategy/assignRole'
+UNASSIGN_ROLE = 'role-strategy/strategy/unassignRole'
 DELETE_SID = 'role-strategy/strategy/deleteSid'
 
 # for testing only
@@ -2286,3 +2287,23 @@ class Jenkins(object):
             response = self.jenkins_request(requests.Request('POST', url, data=data))
         except Exception as e:
             raise JenkinsException('delete_sid error')
+
+    def unassign_role(self, type_name, role_name, sid):
+        """
+        给用户撤销角色
+        :param type_name: projectRoles or globalRoles
+        :param role_name: READ
+        :param sid: 用户sid
+        :return:
+        """
+        url = self._build_url(UNASSIGN_ROLE, locals())
+        data = {
+            "type": type_name,
+            "roleName": role_name,
+            "sid": sid
+        }
+        try:
+            response = self.jenkins_request(requests.Request('POST', url, data=data))
+        except Exception as e:
+            raise JenkinsException('unassign_role error')
+
