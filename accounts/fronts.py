@@ -6,7 +6,10 @@ from django.views.generic import CreateView, UpdateView, ListView
 
 from accounts.forms import RoleForm, UserForm, DomainuthorizedListForm, LdapServerForm
 from accounts.libs.common import IsAdminMixin
+from accounts.libs.con_jenkins import JenkinsApi
+from accounts.libs.yearning_db import yearning_op_add, yearning_op_del
 from accounts.models import User, DomainuthorizedList, Role, WebAuthorizationRecord, LdapServer
+from python_ldap_platform.settings import EXT_PER
 
 
 class UserListView(LoginRequiredMixin, IsAdminMixin, ListView):
@@ -104,6 +107,36 @@ class UserCreateView(LoginRequiredMixin, CreateView):
     template_name = 'accounts/user_form.html'
 
 
+def add_permissions(pers, username, nickname, email):
+    for j in pers:
+        if j == 'jenkins_test':
+            jks = JenkinsApi()
+            jks.assign_role('globalRoles', 'READ', username)
+            jks.assign_role('projectRoles', '测试环境', username)
+        elif j == 'jenkins_dev':
+            jks = JenkinsApi()
+            jks.assign_role('globalRoles', 'READ', username)
+            jks.assign_role('projectRoles', '开发环境', username)
+        elif j == 'yearning':
+            yearning_op_add(username, nickname, email)
+        else:
+            pass
+
+
+def remove_permissions(pers, username, nickname, email):
+    for j in pers:
+        if j == 'jenkins_test':
+            jks = JenkinsApi()
+            jks.unassign_role('projectRoles', '测试环境', username)
+        elif j == 'jenkins_dev':
+            jks = JenkinsApi()
+            jks.unassign_role('projectRoles', '开发环境', username)
+        elif j == 'yearning':
+            yearning_op_del(username, nickname, email)
+        else:
+            pass
+
+
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserForm
@@ -112,10 +145,28 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 
     def post(self, request, **kwargs):
         request.POST = request.POST.copy()
-        # print(request.POST.getlist('roles'))
-        # 开发和测试角色，全部更新jenkins的权限
-        # 开发角色分配Yearing角色权限
-        # 开发角色创建阿里云账号，并授权部分只读权限
+        if EXT_PER == 'yes':
+            # 开启额外权限授权
+            username = self.get_object().username
+            nickname = self.get_object().nickname
+            email = self.get_object().email
+            _old_list = []
+            _new_list = []
+            for i in self.get_object().roles.all():
+                _old_list += i.external_permission.all().values_list('mark', flat=True)
+            old_permission = set(_old_list)
+            for x in request.POST.getlist('roles'):
+                _new_list += Role.objects.get(id=x).external_permission.all().values_list('mark', flat=True)
+            new_permission = set(_new_list)
+            _add_set = new_permission - old_permission
+            _del_set = old_permission - new_permission
+            if _del_set:
+                # 调用删除权限方法 传递role_del
+                remove_permissions(_del_set, username, nickname, email)
+            if _add_set:
+                # 调用增加权限方法 传递role_add
+                add_permissions(_add_set, username, nickname, email)
+
         return super(UserUpdateView, self).post(request, **kwargs)
 
 

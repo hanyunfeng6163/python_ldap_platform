@@ -39,16 +39,24 @@
                                     <td>{{ i.ldap_server }}</td>
 
                                 <td>
+                                    <a  title="管理" href="/accounts/ldapserver/detail/{{ i.id }}/"><i
+                                                data-feather="slack" class="icon-sm"> </i></a>
+                                        &nbsp
+
+                                    <a title="删除" href="javascript:void(0);" onclick="object_delete('/accounts/ldapserver','{{ i.id }}')"><i
+                                                data-feather="x" class="icon-sm"> </i></a>
+                                     <!--
                                     <a class="hidden-button" title="管理" href="/accounts/ldapserver/detail/{{ i.id }}/"><i
                                                 data-feather="slack" class="icon-sm"> </i></a>
                                         &nbsp
-                                    <!--
+
                                  <a class="hidden-button" title="编辑" href="/accounts/ldapserver/update/{{ i.id }}/"><i
                                                 data-feather="edit" class="icon-sm"> </i></a>
                                         &nbsp
--->
+
                                         <a class="hidden-button" title="删除" href="javascript:void(0);" onclick="object_delete('/accounts/ldapserver','{{ i.id }}')"><i
                                                 data-feather="x" class="icon-sm"> </i></a>
+                                                -->
                             </td>
                                 </tr>
                             {% endfor %}

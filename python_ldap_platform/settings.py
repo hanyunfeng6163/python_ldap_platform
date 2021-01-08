@@ -287,7 +287,7 @@ MVX0zMCP+m5Mp7jrDnZIG1fT/jVuzkbQed9WhofpYv3R6zzKo1w=
 DOMAIN_NAME = config.get('base', 'DOMAIN_NAME')
 SITE_NAME = config.get('base', 'SITE_NAME')
 DOMAIN_SUFFIX = config.get('ldap', 'DOMAIN_SUFFIX')
-
+EXT_PER = config.get('base', 'external_permission')
 
 # jenkins配置
 JENKINS_URL = config.get('jenkins', 'JENKINS_URL')
@@ -295,6 +295,12 @@ JENKINS_USERNAME = config.get('jenkins', 'JENKINS_USERNAME')
 JENKINS_PASSWORD = config.get('jenkins', 'JENKINS_PASSWORD')
 
 
+# Yearning配置
+Y_HOST = config.get('yearning', 'host')
+Y_PORT = config.getint('yearning', 'port')
+Y_USER = config.get('yearning', 'user')
+Y_PASSWORD = config.get('yearning', 'password')
+Y_DATABASE = config.get('yearning', 'database')
 
 
 
