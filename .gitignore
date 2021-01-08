@@ -130,3 +130,4 @@ nohup.out
 .vscode/settings.json
 .vscode/
 /logs
+/accounts/migrations/
