@@ -287,6 +287,8 @@ def ldap_user_delete(request, pk, cn):
     for old_del_group in group_dn_list:
         cns = group_dn_magic(old_del_group, ldap_group_dn)
         ad.group_del_user(cns, attr={'uniqueMember': dn})
+    # 判断是否使用额外权限功能，如果使用则开启调用下面方法
+    # 1、所有权限轮训一遍，有就删除，没有就pass；最后删除本地用户
     # 删除当前用户
     if ad.del_obj(dn):
         return JsonResponse({'status': 0})
