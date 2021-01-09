@@ -10,7 +10,7 @@ from accounts.libs.ali import AliRam
 from accounts.libs.common import IsAdminMixin, send_ali_password
 from accounts.libs.con_jenkins import JenkinsApi
 from accounts.libs.yearning_db import yearning_op_add, yearning_op_del
-from accounts.models import User, DomainuthorizedList, Role, WebAuthorizationRecord, LdapServer
+from accounts.models import User, DomainuthorizedList, Role, WebAuthorizationRecord, LdapServer, UserLoginInfo
 from common.lib import random_str
 from python_ldap_platform.settings import EXT_PER, ACCESS_ID, ACCESS_KEY
 
@@ -96,6 +96,7 @@ def user_delete(request, pk):
     status = 1
     try:
         sg = User.objects.get(pk=pk)
+        UserLoginInfo.objects.filter(user=sg).delete()
         sg.delete()
         status = 0
     except Exception as e:
@@ -182,6 +183,7 @@ def remove_all_ext_permissions_and_local_user(username):
 
     try:
         sg = User.objects.get(username=username)
+        UserLoginInfo.objects.filter(user=sg).delete()
         sg.delete()
     except Exception as e:
         pass
@@ -270,7 +272,7 @@ def ldap_user_add_to_local(request):
         cn = request.POST['cn']
         email = "{email_prefix}@{email_suffix}".format(email_prefix=email_prefix, email_suffix=email_suffix)
         try:
-            result = User.objects.create_user(username=cn, email=email, nickname=display_name)
+            result,b = User.objects.get_or_create(username=cn, email=email, nickname=display_name)
             aid = result.id
             status = 0
         except Exception as e:

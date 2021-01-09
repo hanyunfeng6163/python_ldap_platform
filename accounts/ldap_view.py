@@ -174,7 +174,7 @@ def ldap_user_add(request, pk, user_parent_dn):
         except Exception as e:
             logger.error(e)
         # 发送邮件的密码
-        send_ldap_password(username=cn, nickname=display_name, email='hanyunfeng6163@163.com', password=new_password)
+        send_ldap_password(username=cn, nickname=display_name, email=mail, password=new_password)
         return JsonResponse({'status': 0, 'pwd':new_password})
     return render(request, 'ldap/ldap_user_add.html', locals())
 
