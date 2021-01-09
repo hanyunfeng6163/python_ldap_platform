@@ -33,7 +33,7 @@ def yearning_op_add(username, nickname, email):
     connect.close()  # 关闭数据库连接
 
 
-def yearning_op_del(username, nickname, email):
+def yearning_op_del(username):
     connect = pymysql.connect(
         host=settings.Y_HOST,
         port=settings.Y_PORT,

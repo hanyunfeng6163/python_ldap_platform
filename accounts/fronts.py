@@ -131,14 +131,14 @@ def add_permissions(pers, username, nickname, email):
             result = ar.login_profile(username, _password)
             if result['status']:
                 # 发送密码邮件
-                send_ali_password(username, nickname, 'hanyunfeng6163@163.com', _password)
+                send_ali_password(username, nickname, email, _password)
             # 添加到开发组
-            ar.add_user_to_group('username')
+            ar.add_user_to_group(username)
         else:
             pass
 
 
-def remove_permissions(pers, username, nickname, email):
+def remove_permissions(pers, username):
     for j in pers:
         if j == 'jenkins_test':
             jks = JenkinsApi()
@@ -147,7 +147,7 @@ def remove_permissions(pers, username, nickname, email):
             jks = JenkinsApi()
             jks.unassign_role('projectRoles', '开发环境', username)
         elif j == 'yearning':
-            yearning_op_del(username, nickname, email)
+            yearning_op_del(username)
         elif j == 'aliyun-backend-dev':
             ar = AliRam(access_id=ACCESS_ID, access_key=ACCESS_KEY)
             # 移除登陆界面权限
@@ -156,6 +156,35 @@ def remove_permissions(pers, username, nickname, email):
             ar.remove_user_from_group(username)
         else:
             pass
+
+
+def remove_all_ext_permissions_and_local_user(username):
+    try:
+        jks = JenkinsApi()
+        jks.delete_sid('globalRoles', username)
+        jks.delete_sid('projectRoles', username)
+    except Exception as e:
+        pass
+
+    try:
+        yearning_op_del(username)
+    except Exception as e:
+        pass
+
+    try:
+        ar = AliRam(access_id=ACCESS_ID, access_key=ACCESS_KEY)
+        # 移除登陆界面权限
+        ar.delete_login_profile(username)
+        # 移除组
+        ar.remove_user_from_group(username)
+    except Exception as e:
+        pass
+
+    try:
+        sg = User.objects.get(username=username)
+        sg.delete()
+    except Exception as e:
+        pass
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
@@ -183,7 +212,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
             _del_set = old_permission - new_permission
             if _del_set:
                 # 调用删除权限方法 传递role_del
-                remove_permissions(_del_set, username, nickname, email)
+                remove_permissions(_del_set, username)
             if _add_set:
                 # 调用增加权限方法 传递role_add
                 add_permissions(_add_set, username, nickname, email)

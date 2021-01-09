@@ -306,7 +306,7 @@ Y_DATABASE = config.get('yearning', 'database')
 # aly配置
 ACCESS_ID = config.get('aliyun', 'access_id')
 ACCESS_KEY = config.get('aliyun', 'access_key')
-
+ACCOUNT_MAIL = config.get('aliyun', 'accout_mail')
 
 
 

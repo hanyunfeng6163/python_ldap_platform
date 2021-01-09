@@ -9,11 +9,14 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+from accounts.fronts import remove_all_ext_permissions_and_local_user
 from accounts.libs.common import send_ldap_password
 from accounts.libs.con_ldap import AD, group_dn_magic, group_dn_magic_re
 from accounts.models import LdapUserEmailVerifyRecord, LdapServer
 from common.lib import random_str, rsa_decrypt
 from django.utils import timezone
+
+from python_ldap_platform.settings import EXT_PER
 
 logger = logging.getLogger('sso')
 
@@ -170,7 +173,8 @@ def ldap_user_add(request, pk, user_parent_dn):
                 ad.group_add_user(cns, attr={'uniqueMember': dn})
         except Exception as e:
             logger.error(e)
-        send_ldap_password(username=cn, nickname=display_name, email=mail, password=new_password)
+        # 发送邮件的密码
+        send_ldap_password(username=cn, nickname=display_name, email='hanyunfeng6163@163.com', password=new_password)
         return JsonResponse({'status': 0, 'pwd':new_password})
     return render(request, 'ldap/ldap_user_add.html', locals())
 
@@ -288,7 +292,8 @@ def ldap_user_delete(request, pk, cn):
         cns = group_dn_magic(old_del_group, ldap_group_dn)
         ad.group_del_user(cns, attr={'uniqueMember': dn})
     # 判断是否使用额外权限功能，如果使用则开启调用下面方法
-    # 1、所有权限轮训一遍，有就删除，没有就pass；最后删除本地用户
+    if EXT_PER == 'yes':
+        remove_all_ext_permissions_and_local_user(username=cn)
     # 删除当前用户
     if ad.del_obj(dn):
         return JsonResponse({'status': 0})
